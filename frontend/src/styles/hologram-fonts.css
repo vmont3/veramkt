@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&family=Audiowide&display=swap');
+
+.font-holo-title {
+    font-family: 'Audiowide', cursive;
+    letter-spacing: 0.1em;
+}
+
+.font-holo-body {
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.font-holo-tech {
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Custom Scanlines for HUD texts */
+.scanline-text {
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 243, 255, 0.05) 50%);
+    background-size: 100% 4px;
+}

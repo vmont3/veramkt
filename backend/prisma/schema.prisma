@@ -1,0 +1,623 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id                String              @id @default(uuid())
+  email             String              @unique
+  password          String
+  name              String?
+  cnpj              String?             @unique // Required for free plan
+  plans             ContentPlan[]
+  brands            Brand[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  credits           Int                 @default(300) // Free plan base credits
+  role              String              @default("USER") // USER, ADMIN, SUPER_ADMIN
+  transactions      CreditTransaction[]
+  agentConfigs      AgentConfig[]
+  adBudget          Float               @default(0.0)
+  profilePictureUrl String?
+  phone             String?
+  gender            String?             @default("masculino")
+  website           String?
+  apiKey            String?             @unique // API key for tracking script integration
+
+  // Referral system fields
+  referralCode      String?    @unique
+  referredBy        String?
+  referralsGiven    Referral[] @relation("Referrer")
+  referralsReceived Referral[] @relation("Referred")
+
+  // Support Chat
+  supportChats SupportChat[]
+
+  // Killer Features Relations
+  buyerSignals    BuyerSignal[]
+  agentExecutions AgentExecution[]
+}
+
+model CreditTransaction {
+  id          String   @id @default(uuid())
+  userId      String
+  amount      Int // Positive for add, Negative for spend
+  type        String // "USAGE", "PURCHASE", "BONUS", "REFUND"
+  description String
+  agentId     String? // If spent by an agent
+  status      String   @default("COMPLETED") // COMPLETED, PENDING, FAILED
+  metadata    String? // JSON string with additional data
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Brand {
+  id             String          @id @default(uuid())
+  name           String
+  userId         String
+  user           User            @relation(fields: [userId], references: [id])
+  telegramUsers  TelegramUser[] // Staff/Admins authorized for this Brand
+  telegramGroups TelegramGroup[] // Groups authorized for this Brand
+  plans          ContentPlan[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  logoUrl        String?
+  assets         BrandAsset[]
+  liveOpsConfig  String? // JSON string for S.A.L.A. config (active countermeasures)
+  website        String?
+  industry       String?
+  analyses       BrandAnalysis[] // Website learner analysis results
+}
+
+model BrandAsset {
+  id        String   @id @default(uuid())
+  brandId   String
+  type      String // "LOGO", "MANUAL", "REFERENCE", "OTHER"
+  url       String
+  name      String
+  mimeType  String
+  fileSize  Int
+  summary   String? // AI extracted summary
+  createdAt DateTime @default(now())
+  brand     Brand    @relation(fields: [brandId], references: [id])
+}
+
+model TelegramUser {
+  id         String   @id @default(uuid())
+  telegramId String   @unique
+  username   String?
+  firstName  String?
+  brandId    String
+  brand      Brand    @relation(fields: [brandId], references: [id])
+  role       String   @default("member") // owner, admin, member
+  createdAt  DateTime @default(now())
+}
+
+model TelegramGroup {
+  id         String   @id @default(uuid())
+  telegramId String   @unique
+  title      String?
+  brandId    String
+  brand      Brand    @relation(fields: [brandId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model ContentPlan {
+  id           String      @id @default(uuid())
+  userId       String
+  brandId      String
+  period       String
+  platforms    String // JSON array string
+  contentCount Int
+  themes       String // JSON array string
+  status       String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  user         User        @relation(fields: [userId], references: [id])
+  brand        Brand       @relation(fields: [brandId], references: [id])
+  tasks        TaskQueue[]
+}
+
+model TaskQueue {
+  id          String      @id @default(uuid())
+  planId      String
+  agentId     String
+  taskType    String
+  priority    String
+  status      String
+  data        String // JSON string
+  result      String? // JSON string
+  createdAt   DateTime    @default(now())
+  completedAt DateTime?
+  plan        ContentPlan @relation(fields: [planId], references: [id])
+}
+
+model MarketTrend {
+  id            String   @id @default(uuid())
+  platform      String
+  trend         String
+  category      String
+  relevance     Float
+  volume        Int
+  sentiment     String
+  keywords      String // JSON array
+  platforms     String // JSON array
+  opportunities String // JSON array
+  detectedAt    DateTime @default(now())
+  expiresAt     DateTime
+
+  @@unique([platform, trend])
+}
+
+model Competitor {
+  id        String   @id @default(uuid())
+  handle    String
+  name      String
+  createdAt DateTime @default(now())
+}
+
+model CompetitorMetric {
+  id           String   @id @default(uuid())
+  competitorId String
+  platform     String
+  followers    Int
+  createdAt    DateTime @default(now())
+}
+
+model CompetitorInsight {
+  id             String   @id @default(uuid())
+  competitorId   String
+  competitorName String
+  platform       String
+  strategy       String
+  engagement     Float
+  growthRate     Float
+  topContent     String
+  weakness       String
+  opportunity    String
+  analyzedAt     DateTime @default(now())
+}
+
+model MarketOpportunity {
+  id               String   @id @default(uuid())
+  type             String
+  description      String
+  platform         String
+  targetAudience   String
+  estimatedReach   Float
+  difficulty       String
+  recommendedAgent String
+  priority         String
+  actionItems      String // JSON array
+  createdAt        DateTime @default(now())
+}
+
+model MarketInsight {
+  id        String   @id
+  data      String // JSON string
+  updatedAt DateTime
+}
+
+model GeneratedDesign {
+  id              String   @id @default(uuid())
+  briefId         String
+  imageUrl        String
+  prompt          String
+  aiProvider      String
+  quality         Int
+  engagementScore Int
+  createdAt       DateTime @default(now())
+}
+
+model GeneratedCopy {
+  id                   String   @id @default(uuid())
+  briefId              String
+  text                 String
+  characterCount       Int
+  wordCount            Int
+  estimatedEngagement  Int
+  sentiment            String
+  callToActionStrength Int
+  personalityScore     Int
+  createdAt            DateTime @default(now())
+}
+
+model BrandProfile {
+  id             String   @id @default(uuid())
+  userId         String
+  brandName      String
+  tagline        String
+  mission        String
+  vision         String
+  values         String // JSON array
+  targetAudience String
+  positioning    String
+  uniqueValue    String
+  competitors    String // JSON array
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model BrandGuidelines {
+  id                   String   @id @default(uuid())
+  brandId              String   @unique
+  colorPalette         String // JSON object
+  typography           String // JSON object
+  tone                 String
+  voiceCharacteristics String // JSON array
+  visualStyle          String
+  imagery              String // JSON array
+  messaging            String // JSON object
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model BrandConsistencyReport {
+  id               String   @id @default(uuid())
+  brandId          String
+  platform         String
+  consistencyScore Float
+  issues           String // JSON array
+  recommendations  String // JSON array
+  analyzedAt       DateTime @default(now())
+}
+
+model BrandStrategy {
+  id        String   @id @default(uuid())
+  brandId   String
+  name      String
+  strategy  String // JSON object
+  createdAt DateTime @default(now())
+}
+
+model AgentConfig {
+  id        String   @id @default(uuid())
+  userId    String
+  agentId   String
+  isEnabled Boolean  @default(true)
+  prompt    String? // Custom prompt overriding defaults
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, agentId])
+}
+
+model AgentSnapshot {
+  id          String   @id @default(uuid())
+  agentId     String
+  brandId     String
+  reason      String // "DOPAMINE_PEAK", "MANUAL", "PERIODIC"
+  healthScore Int
+  data        String // JSON string containing context/memory
+  createdAt   DateTime @default(now())
+
+  @@index([agentId, brandId])
+}
+
+model AgentInteraction {
+  id              String   @id @default(uuid())
+  agentId         String
+  platform        String
+  userId          String
+  messageType     String
+  userResponse    String
+  sentiment       String
+  feedback        String? // "POSITIVE" | "NEGATIVE"
+  converted       Boolean
+  responseTime    Int
+  engagementScore Int
+  timestamp       DateTime @default(now())
+}
+
+model AgentPerformance {
+  id               String    @id @default(uuid())
+  agentId          String
+  platform         String
+  healthScore      Int       @default(100) // 0-100 Dopamine Level
+  lastResetAt      DateTime?
+  engagementRate   Float
+  conversionRate   Float
+  responseTime     Float
+  accuracyScore    Float
+  improvementTrend String
+  lastUpdated      DateTime  @default(now())
+
+  @@unique([agentId, platform])
+}
+
+model AgentPattern {
+  id                    String   @id @default(uuid())
+  agentId               String
+  platform              String
+  sentimentDistribution String // JSON string
+  bestMessageType       String
+  bestConversionRate    Float
+  messageTypePatterns   String // JSON string
+  analysisDate          DateTime @default(now())
+
+  @@unique([agentId, platform])
+}
+
+model StrategyAdjustment {
+  id         String   @id @default(uuid())
+  agentId    String
+  platform   String
+  adjustment String
+  priority   String
+  action     String
+  parameters String // JSON string
+  appliedAt  DateTime @default(now())
+}
+
+model AdIntelligence {
+  id             String   @id @default(uuid())
+  competitorName String
+  platform       String // "facebook", "google", "tiktok", "linkedin", "twitter", "youtube"
+  adFormat       String // "image", "video", "carousel", "text"
+  adCopy         String
+  ctaType        String
+  creativeUrl    String?
+  landingPageUrl String?
+  detectedAt     DateTime @default(now())
+  activeDays     Int      @default(1)
+  estimatedSpend Int?
+}
+
+model BrandAlert {
+  id          String   @id @default(uuid())
+  type        String // "sentiment_drop", "competitor_attack", "viral_negative"
+  severity    String // "low", "medium", "critical"
+  platform    String
+  description String
+  detectedAt  DateTime @default(now())
+  status      String // "active", "resolved"
+  actionItem  String? // Suggestion from VERA
+}
+
+model Lead {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  source    String?
+  phone     String?
+  status    String   @default("new") // new, contacted, converted
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Campaign {
+  id        String    @id @default(uuid())
+  name      String
+  platform  String // facebook, google, tiktok
+  status    String // active, paused, completed
+  budget    Float
+  spend     Float
+  cpa       Float
+  roas      Float
+  ctr       Float
+  cpm       Float
+  frequency Float
+  startDate DateTime
+  endDate   DateTime?
+  updatedAt DateTime  @updatedAt
+}
+
+// Dopamine Feedback Loop - Agent Learning System
+model AgentFeedback {
+  id        String   @id @default(uuid())
+  agentId   String // ID do agente (ex: 'copy-social-short')
+  userId    String // Usuário dono do feedback
+  type      String // 'dopamine' ou 'pain'
+  reason    String // Motivo do feedback
+  source    String // 'auto' (agente) ou 'manual' (usuário)
+  taskId    String? // Opcional: ID da tarefa relacionada
+  score     Float    @default(1.0) // Intensidade do sinal (1.0 = normal)
+  createdAt DateTime @default(now())
+
+  @@index([agentId, userId])
+}
+
+// Content Quality Log - Anti-Clichés System
+model ContentQualityLog {
+  id               String   @id @default(uuid())
+  agentId          String // ID do agente que gerou
+  userId           String // Usuário dono do conteúdo
+  rawContent       String // Conteúdo original (antes de humanizar)
+  humanizedContent String // Conteúdo após humanização
+  qualityScore     Int // Score 0-100 de naturalidade
+  issuesFound      Int // Número de problemas detectados
+  issuesDetails    String // JSON com detalhes dos issues
+  createdAt        DateTime @default(now())
+
+  @@index([agentId, userId])
+  @@index([qualityScore])
+  @@index([createdAt])
+}
+
+model Referral {
+  id           String    @id @default(uuid())
+  referrerId   String
+  referredId   String
+  referredCNPJ String // CNPJ do indicado (validação anti-fraude)
+  status       String // pending, confirmed
+  bonusGranted Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  confirmedAt  DateTime?
+
+  referrer User @relation("Referrer", fields: [referrerId], references: [id])
+  referred User @relation("Referred", fields: [referredId], references: [id])
+
+  @@index([referrerId])
+  @@index([referredCNPJ])
+}
+
+// Sistema de Chat de Suporte com Telegram
+model SupportChat {
+  id          String           @id @default(uuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  status      String           @default("open") // open, closed, pending
+  subject     String?
+  lastMessage String?
+  unreadCount Int              @default(0) // Mensagens não lidas pelo admin
+  messages    SupportMessage[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model SupportMessage {
+  id        String      @id @default(uuid())
+  chatId    String
+  chat      SupportChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender    String // "user" ou "admin"
+  message   String
+  isRead    Boolean     @default(false)
+  createdAt DateTime    @default(now())
+
+  @@index([chatId])
+  @@index([createdAt])
+}
+
+// Chat Message History (for intelligent conversation)
+model ChatMessage {
+  id        String   @id @default(uuid())
+  chatId    String // Agrupa conversa (pode ser userId ou sessionId)
+  userId    String
+  role      String // 'user' ou 'assistant'
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([chatId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Integrations (OAuth tokens for Canva, Google, Meta, etc)
+model Integration {
+  id           String    @id @default(uuid())
+  userId       String
+  platform     String // 'canva', 'google', 'meta', 'linkedin', etc
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime?
+  scopes       String? // Comma-separated list
+  isActive     Boolean   @default(true)
+  metadata     String? // JSON with extra data
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([userId, platform])
+  @@index([userId])
+  @@index([platform])
+}
+
+// Uploaded Files (images, videos) for content creation
+model UploadedFile {
+  id           String   @id @default(uuid())
+  userId       String
+  filename     String // UUID-based filename on disk
+  originalName String // Original filename from user
+  mimeType     String // image/png, video/mp4, etc
+  type         String // 'image', 'video', 'other'
+  size         Int // File size in bytes
+  path         String // Full path on server
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// ========================================
+// KILLER FEATURES - Auto-Learn & Buyer Signals
+// ========================================
+
+// Brand Analysis from Website Learner (Klaviyo killer)
+model BrandAnalysis {
+  id        String   @id @default(uuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id])
+  analysis  String // JSON string with full WebsiteAnalysis data
+  source    String // "website_learner", "manual", "import"
+  createdAt DateTime @default(now())
+
+  @@index([brandId])
+  @@index([createdAt])
+}
+
+// Buyer Signals - Real-time intent tracking (Warmly killer)
+model BuyerSignal {
+  id          String   @id @default(uuid())
+  visitorId   String // Persistent visitor identifier (localStorage)
+  sessionId   String // Session identifier (sessionStorage, 30min timeout)
+  userId      String // VERA user who owns this tracking
+  user        User     @relation(fields: [userId], references: [id])
+  type        String // PAGE_VIEW, TIME_ON_PAGE, FORM_INTERACTION, BUTTON_CLICK, etc
+  source      String // "website", "email", "ad", "social"
+  data        String // JSON string with signal-specific data
+  metadata    String // JSON string with page, referrer, device, timestamp
+  intentScore Int // Calculated intent score 0-100
+  timestamp   DateTime @default(now())
+
+  @@index([visitorId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([intentScore])
+  @@index([timestamp])
+}
+
+// Visitor Profile - Aggregated intent data per visitor
+model VisitorProfile {
+  id               String   @id @default(uuid())
+  visitorId        String   @unique
+  userId           String // VERA user who owns this visitor
+  totalScore       Int // Total accumulated intent score
+  stage            String // "cold", "warm", "hot", "qualified"
+  firstSeen        DateTime
+  lastSeen         DateTime
+  signalCount      Int // Total signals tracked
+  sessionCount     Int // Number of sessions
+  highValueActions Int // Count of high-intent actions (form fills, downloads, etc)
+  metadata         String? // JSON with additional data (email if identified, company, etc)
+
+  @@index([userId])
+  @@index([stage])
+  @@index([totalScore])
+  @@index([lastSeen])
+}
+
+// Agent Execution History - Track orchestrator performance and costs
+model AgentExecution {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  agentType       String // "strategy_agent", "copy_agent", "chat_agent", etc
+  task            String // JSON string with task details
+  result          String? // JSON string with execution result
+  costUSD         Float // Cost in USD
+  costCredits     Int // Cost in VERACredits (1 USD = 100 VC)
+  cached          Boolean  @default(false) // Was this from cache?
+  cacheHit        Boolean  @default(false) // For analytics
+  inputTokens     Int      @default(0)
+  outputTokens    Int      @default(0)
+  qualityScore    Int? // Anti-AI quality score 0-100
+  executionTimeMs Int? // Execution time in milliseconds
+  status          String   @default("completed") // "completed", "failed", "cached"
+  errorMessage    String? // If failed
+  metadata        String? // JSON with additional data
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([agentType])
+  @@index([cached])
+  @@index([createdAt])
+  @@index([status])
+}
