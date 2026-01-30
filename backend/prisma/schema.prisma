@@ -48,7 +48,7 @@ model SystemLog {
   type      String?
   source    String?
   message   String?
-  metadata  String? // Changed from Json to String for compatibility
+  metadata  String? // FIXED: Changed from Json to String for connector compatibility
   createdAt DateTime @default(now())
 }
 
