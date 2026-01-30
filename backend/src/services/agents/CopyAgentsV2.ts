@@ -1,6 +1,6 @@
 // backend/src/services/agents/CopyAgentsV2.ts
 import { agentOrchestrator } from '../orchestration/AgentOrchestrator';
-import { AgentPersonas } from './AgentPersonas';
+import { AGENT_PERSONAS } from './AgentPersonas';
 
 // ==============================================
 // COPY SOCIAL SHORT AGENT (Instagram, X, TikTok)

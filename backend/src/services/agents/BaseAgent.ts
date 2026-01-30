@@ -12,8 +12,8 @@
 import { prisma } from "../../database/prismaClient";
 import ContentValidator, { ValidationResult } from '../ai/ContentValidator';
 import ContentHumanizer from '../ai/ContentHumanizer';
-import { aiRouterService } from '../ai/AIRouterService';
-import { tokenService } from '../billing/TokenService';
+import { AIRouterService } from '../ai/AIRouterService';
+import { TokenService } from '../billing/TokenService';
 
 // Instâncias globais (reutilizadas)
 const contentValidator = new ContentValidator();
@@ -90,7 +90,8 @@ export abstract class BaseAgent {
     protected abstract knowledgeBase: string; // Concrete classes must define or we might need to change structure
 
     // NOVO: Referência aos serviços AI
-    protected aiRouter = aiRouterService;
+    protected aiRouter = new AIRouterService();
+    protected tokenService = new TokenService();
 
     constructor(agentId: string, agentName: string, domain: string) {
         this.agentId = agentId;
@@ -251,7 +252,7 @@ export abstract class BaseAgent {
             }
 
             // 3. Calcular custo real
-            const actualCost = await tokenService.calculateCost(
+            const actualCost = await this.tokenService.calculateCost(
                 agentTypeKey,
                 result.provider,
                 result.model,
