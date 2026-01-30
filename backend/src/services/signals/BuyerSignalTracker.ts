@@ -423,20 +423,31 @@ export class BuyerSignalTracker extends EventEmitter {
             // Alert thresholds
             const shouldAlert = profile.stage === 'hot' || profile.stage === 'qualified';
 
-            if (shouldAlert && profile.identifiedUser) {
+            // Find the userId from the signals
+            const userSignal = profile.signals.find(s => s.userId);
+            const userId = userSignal?.userId;
+
+            if (shouldAlert && userId) {
                 // Get alert settings for user
-                const settings = await alertManager.getUserAlertSettings(profile.identifiedUser);
+                const settings = await alertManager.getUserAlertSettings(userId);
+
+                // Calculate high value actions (form interactions, downloads, chat messages)
+                const highValueActions = profile.signals.filter(s =>
+                    s.type === SignalType.FORM_INTERACTION ||
+                    s.type === SignalType.DOWNLOAD ||
+                    s.type === SignalType.CHAT_MESSAGE
+                ).length;
 
                 // Prepare hot lead data
                 const hotLeadData = {
-                    userId: profile.identifiedUser,
+                    userId: userId,
                     visitorId: profile.visitorId,
                     totalScore: profile.totalScore,
                     stage: profile.stage,
                     lastSeen: new Date(profile.lastSeen),
                     sessionCount: profile.sessionCount,
-                    signalCount: profile.signalCount,
-                    highValueActions: profile.highValueActions || 0
+                    signalCount: profile.signals.length,
+                    highValueActions: highValueActions
                 };
 
                 // Send alert through AlertManager (with rate limiting)
