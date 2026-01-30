@@ -1,0 +1,5 @@
+{
+  "ignore": ["dev.db", "dev.db-journal", "uploads/*"],
+  "watch": ["src"],
+  "ext": "ts,js,json"
+}
