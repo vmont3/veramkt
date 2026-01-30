@@ -41,7 +41,6 @@ model User {
   // Killer Features Relations
   buyerSignals    BuyerSignal[]
   agentExecutions AgentExecution[]
-  telegramChatId  String?
 }
 
 model SystemLog {
@@ -53,16 +52,6 @@ model SystemLog {
   createdAt DateTime @default(now())
 }
 
-model AIUsageLog {
-  id String @id @default(uuid())
-}
-
-model UserPreferences {
-  id                 String  @id @default(uuid())
-  userId             String  @unique
-  notificationMethod String?
-  user               User    @relation(fields: [userId], references: [id])
-}
 
 model CreditTransaction {
   id          String   @id @default(uuid())
@@ -645,14 +634,6 @@ model AgentExecution {
 }
 
 
-model SystemLog {
-  id        String   @id @default(uuid())
-  type      String
-  source    String
-  message   String
-  metadata  String? // JSON string
-  createdAt DateTime @default(now())
-}
 
 model AIUsageLog {
   id           String   @id @default(uuid())
