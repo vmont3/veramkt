@@ -2,11 +2,14 @@
 import { agentOrchestrator } from '../orchestration/AgentOrchestrator';
 import { prisma } from '../../database/prismaClient';
 
+export interface VeraRequest { [key: string]: any; }
+
+
 export class VeraOrchestrator {
     /**
      * Processa requisições da VERA
      */
-    async processRequest(request: any): Promise<any> {
+    async processRequest(request: VeraRequest): Promise<any> {
         const { type, payload, userId } = request;
 
         try {

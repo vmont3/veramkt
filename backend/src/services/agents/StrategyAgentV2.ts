@@ -29,6 +29,11 @@ export class StrategyAgentMigrated extends BaseAgent {
         super('head-strategy', 'Head de Estratégia', 'strategy');
     }
 
+    // Abstract methods implementation for migration
+    get agentType(): string { return 'strategy'; }
+    get knowledgeBase(): string { return 'marketing_strategy'; }
+    buildSystemPrompt(): string { return 'Generic Strategy Prompt'; }
+
     public async execute(userId: string, brief: StrategyBrief): Promise<StrategyOutput> {
         console.log(`[${this.agentName}] 🎯 Executando análise estratégica...`);
 

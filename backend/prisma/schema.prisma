@@ -12,6 +12,7 @@ model User {
   email             String              @unique
   password          String
   name              String?
+  telegramChatId    String?
   cnpj              String?             @unique // Required for free plan
   plans             ContentPlan[]
   brands            Brand[]
@@ -40,6 +41,27 @@ model User {
   // Killer Features Relations
   buyerSignals    BuyerSignal[]
   agentExecutions AgentExecution[]
+  telegramChatId  String?
+}
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  type      String?
+  source    String?
+  message   String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
+
+model AIUsageLog {
+  id String @id @default(uuid())
+}
+
+model UserPreferences {
+  id                 String  @id @default(uuid())
+  userId             String  @unique
+  notificationMethod String?
+  user               User    @relation(fields: [userId], references: [id])
 }
 
 model CreditTransaction {
@@ -620,4 +642,36 @@ model AgentExecution {
   @@index([cached])
   @@index([createdAt])
   @@index([status])
+}
+
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  type      String
+  source    String
+  message   String
+  metadata  String? // JSON string
+  createdAt DateTime @default(now())
+}
+
+model AIUsageLog {
+  id           String   @id @default(uuid())
+  userId       String
+  agentId      String
+  provider     String
+  model        String
+  inputTokens  Int
+  outputTokens Int
+  cost         Float
+  createdAt    DateTime @default(now())
+}
+
+model UserPreferences {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  notificationMethod String   @default("telegram") // telegram, email, dashboard
+  theme              String   @default("dark")
+  language           String   @default("pt-BR")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
