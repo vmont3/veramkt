@@ -15,8 +15,15 @@ import { BaseAgent, UserContext, ContentOutput } from './BaseAgent';
 
 // ==================== CLOSER AGENT (SDR) ====================
 export class CloserAgent extends BaseAgent {
+    agentType = 'crm-closer';
+    protected knowledgeBase = 'Sales Development, BANT Qualification, Objection Handling, Lead Qualification, Closing Techniques';
+
     constructor() {
         super('crm-closer', 'Closer SDR', 'crm');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um SDR expert em qualificação e fechamento de vendas. Crie scripts naturais e efetivos.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
@@ -45,8 +52,15 @@ export class CloserAgent extends BaseAgent {
 
 // ==================== SUCCESS AGENT ====================
 export class SuccessAgent extends BaseAgent {
+    agentType = 'crm-success';
+    protected knowledgeBase = 'Customer Success, Customer Retention, Onboarding, Account Management, Churn Prevention';
+
     constructor() {
         super('crm-success', 'Customer Success', 'crm');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um especialista em Customer Success. Crie estratégias para maximizar retenção e satisfação.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
@@ -74,8 +88,15 @@ export class SuccessAgent extends BaseAgent {
 
 // ==================== ENRICHER AGENT ====================
 export class EnricherAgent extends BaseAgent {
+    agentType = 'crm-enricher';
+    protected knowledgeBase = 'Data Enrichment, Lead Intelligence, Firmographic Data, Company Research, Contact Information';
+
     constructor() {
         super('crm-enricher', 'Enriquecedor de Dados', 'crm');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um especialista em enriquecimento de dados de leads. Identifique e qualifique informações de contatos.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
@@ -99,8 +120,15 @@ export class EnricherAgent extends BaseAgent {
 
 // ==================== FINANCE GUARD AGENT ====================
 export class FinanceGuardAgent extends BaseAgent {
+    agentType = 'finance-guard';
+    protected knowledgeBase = 'Financial Management, Budget Control, ROI Analysis, Cost Optimization, Financial Alerts';
+
     constructor() {
         super('finance-guard', 'Guardião Financeiro', 'strategy');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um CFO virtual. Monitore gastos, alerte sobre excessos e otimize investimentos em marketing.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
@@ -124,8 +152,15 @@ export class FinanceGuardAgent extends BaseAgent {
 
 // ==================== EDITOR CHIEF AGENT ====================
 export class EditorChiefAgent extends BaseAgent {
+    agentType = 'editor-chief';
+    protected knowledgeBase = 'Content Quality Control, Editorial Standards, Brand Consistency, Style Guide Enforcement';
+
     constructor() {
         super('editor-chief', 'Editor Chefe', 'strategy');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um editor-chefe rigoroso. Revise conteúdo garantindo qualidade, consistência e alinhamento com a marca.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {

@@ -28,8 +28,15 @@ export interface DesignOutput {
 
 // ==================== DESIGN SOCIAL ====================
 export class DesignSocialAgent extends BaseAgent {
+    agentType = 'design-social';
+    protected knowledgeBase = 'Social Media Design, Visual Identity, Instagram Design, Stories, Reels, Post Templates';
+
     constructor() {
         super('design-social', 'Designer Social', 'design');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um designer especializado em redes sociais. Crie conceitos visuais impactantes e alinhados com a marca.';
     }
 
     public async execute(userId: string, task: DesignTask): Promise<DesignOutput> {
@@ -114,8 +121,15 @@ Moderno, premium, tech-forward, confiável`;
 
 // ==================== DESIGN ADS ====================
 export class DesignAdsAgent extends BaseAgent {
+    agentType = 'design-ads';
+    protected knowledgeBase = 'Ad Creative Design, Conversion-Focused Design, A/B Testing Visuals, Ad Formats, CTA Design';
+
     constructor() {
         super('design-ads', 'Designer de Anúncios', 'design');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um designer especializado em criativos de anúncios. Crie designs que convertem e geram ROI.';
     }
 
     public async execute(userId: string, task: DesignTask): Promise<DesignOutput> {
@@ -164,8 +178,15 @@ SPECS TÉCNICAS:
 
 // ==================== DESIGN LANDING ====================
 export class DesignLandingAgent extends BaseAgent {
+    agentType = 'design-landing';
+    protected knowledgeBase = 'Landing Page Design, Conversion Rate Optimization, UX/UI Design, Web Design Best Practices';
+
     constructor() {
         super('design-landing', 'Designer de Landing Pages', 'design');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um designer especializado em landing pages de alta conversão. Crie designs otimizados para CRO.';
     }
 
     public async execute(userId: string, task: DesignTask): Promise<DesignOutput> {
@@ -225,8 +246,15 @@ UX OTIMIZAÇÕES:
 
 // ==================== VIDEO SCRIPT AGENT ====================
 export class VideoScriptAgent extends BaseAgent {
+    agentType = 'video-script';
+    protected knowledgeBase = 'Video Scriptwriting, Storytelling, Hook Writing, Video Marketing, YouTube, TikTok, Reels Scripts';
+
     constructor() {
         super('video-script', 'Roteirista de Vídeo', 'design');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um roteirista de vídeos virais. Crie scripts naturais, engajantes e otimizados para cada plataforma.';
     }
 
     public async execute(userId: string, task: DesignTask): Promise<DesignOutput> {

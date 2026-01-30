@@ -17,8 +17,15 @@ import { BaseAgent, UserContext, ContentOutput } from './BaseAgent';
 
 // ==================== META ADS MANAGER ====================
 export class MetaAdsManagerAgent extends BaseAgent {
+    agentType = 'manager-meta';
+    protected knowledgeBase = 'Meta Ads, Facebook Ads, Instagram Ads, Campaign Budget Optimization, Ad Sets, Targeting';
+
     constructor() {
         super('manager-meta', 'Gestor Meta Ads', 'ads');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um especialista em Meta Ads (Facebook/Instagram). Crie estratégias de campanha otimizadas.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
@@ -70,8 +77,15 @@ KPIs:
 
 // ==================== GOOGLE ADS MANAGER ====================
 export class GoogleAdsManagerAgent extends BaseAgent {
+    agentType = 'manager-google';
+    protected knowledgeBase = 'Google Ads, Search Ads, Display Ads, YouTube Ads, Keyword Research, Quality Score';
+
     constructor() {
         super('manager-google', 'Gestor Google Ads', 'ads');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um especialista em Google Ads. Crie campanhas de Search, Display e YouTube otimizadas.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
@@ -124,8 +138,15 @@ OTIMIZAÇÕES:
 
 // ==================== TIKTOK ADS MANAGER ====================
 export class TikTokAdsManagerAgent extends BaseAgent {
+    agentType = 'manager-tiktok';
+    protected knowledgeBase = 'TikTok Ads, Short-form Video Marketing, TikTok Algorithm, Organic + Paid Strategy';
+
     constructor() {
         super('manager-tiktok', 'Gestor TikTok Ads', 'ads');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um especialista em TikTok Ads e marketing de vídeos curtos. Crie estratégias virais.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
@@ -176,8 +197,15 @@ MÉTRICAS:
 
 // ==================== LINKEDIN ADS MANAGER ====================
 export class LinkedInAdsManagerAgent extends BaseAgent {
+    agentType = 'manager-linkedin';
+    protected knowledgeBase = 'LinkedIn Ads, B2B Marketing, Lead Generation, Account-Based Marketing, Professional Targeting';
+
     constructor() {
         super('manager-linkedin', 'Gestor LinkedIn Ads', 'ads');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um especialista em LinkedIn Ads e marketing B2B. Crie campanhas de geração de leads profissionais.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
@@ -231,8 +259,15 @@ OTIMIZAÇÃO:
 
 // ==================== BI AGENT ====================
 export class BIAgent extends BaseAgent {
+    agentType = 'analyst-bi';
+    protected knowledgeBase = 'Business Intelligence, Data Analytics, KPIs, Performance Metrics, Dashboard Reporting';
+
     constructor() {
         super('analyst-bi', 'Analista de BI', 'analytics');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um analista de Business Intelligence. Crie relatórios detalhados com insights acionáveis.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
@@ -280,8 +315,15 @@ RECOMENDAÇÕES:
 
 // ==================== TREND AGENT ====================
 export class TrendAgent extends BaseAgent {
+    agentType = 'analyst-market';
+    protected knowledgeBase = 'Trend Spotting, Market Research, Viral Content Analysis, Social Media Trends, Consumer Behavior';
+
     constructor() {
         super('analyst-market', 'Caçador de Tendências', 'analytics');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um analista de tendências de mercado. Identifique trends emergentes e oportunidades de conteúdo viral.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
@@ -321,8 +363,15 @@ export class TrendAgent extends BaseAgent {
 
 // ==================== COMPETITOR AGENT ====================
 export class CompetitorAgent extends BaseAgent {
+    agentType = 'analyst-competitor';
+    protected knowledgeBase = 'Competitive Intelligence, Market Analysis, SWOT Analysis, Competitor Tracking, Benchmarking';
+
     constructor() {
         super('analyst-competitor', 'Espião de Concorrência', 'analytics');
+    }
+
+    protected buildSystemPrompt(): string {
+        return 'Você é um analista de inteligência competitiva. Analise concorrentes e identifique oportunidades estratégicas.';
     }
 
     public async execute(userId: string, task: any): Promise<any> {
