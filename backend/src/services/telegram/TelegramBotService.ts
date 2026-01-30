@@ -103,44 +103,44 @@ export class TelegramBotService {
         if (!this.bot) return;
 
         // /start - Link Telegram account
-        this.bot.onText(/\/start(.*)/, async (msg, match) => {
+        this.bot.onText(/\/start(.*)/, async (msg: TelegramBot.Message, match: RegExpExecArray | null) => {
             await this.handleStart(msg, match?.[1]);
         });
 
         // /status - System status
-        this.bot.onText(/\/status/, async (msg) => {
+        this.bot.onText(/\/status/, async (msg: TelegramBot.Message) => {
             await this.handleStatus(msg);
         });
 
         // /leads - Hot leads
-        this.bot.onText(/\/leads/, async (msg) => {
+        this.bot.onText(/\/leads/, async (msg: TelegramBot.Message) => {
             await this.handleLeads(msg);
         });
 
         // /analytics - Analytics summary
-        this.bot.onText(/\/analytics/, async (msg) => {
+        this.bot.onText(/\/analytics/, async (msg: TelegramBot.Message) => {
             await this.handleAnalytics(msg);
         });
 
         // /create - Create content
-        this.bot.onText(/\/create (.+)/, async (msg, match) => {
+        this.bot.onText(/\/create (.+)/, async (msg: TelegramBot.Message, match: RegExpExecArray | null) => {
             await this.handleCreate(msg, match?.[1]);
         });
 
         // /help - Show help
-        this.bot.onText(/\/help/, async (msg) => {
+        this.bot.onText(/\/help/, async (msg: TelegramBot.Message) => {
             await this.handleHelp(msg);
         });
 
         // Natural language fallback
-        this.bot.on('message', async (msg) => {
+        this.bot.on('message', async (msg: TelegramBot.Message) => {
             if (msg.text && !msg.text.startsWith('/')) {
                 await this.handleNaturalLanguage(msg);
             }
         });
 
         // Handle callback queries (inline buttons)
-        this.bot.on('callback_query', async (query) => {
+        this.bot.on('callback_query', async (query: TelegramBot.CallbackQuery) => {
             await this.handleCallbackQuery(query);
         });
     }
