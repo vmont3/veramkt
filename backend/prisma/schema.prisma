@@ -48,7 +48,7 @@ model SystemLog {
   type      String?
   source    String?
   message   String?
-  metadata  Json?
+  metadata  String?
   createdAt DateTime @default(now())
 }
 
