@@ -619,6 +619,7 @@ model AgentExecution {
   costCredits     Int // Cost in VERACredits (1 USD = 100 VC)
   cached          Boolean  @default(false) // Was this from cache?
   cacheHit        Boolean  @default(false) // For analytics
+  input           String?
   inputTokens     Int      @default(0)
   outputTokens    Int      @default(0)
   qualityScore    Int? // Anti-AI quality score 0-100
@@ -641,6 +642,7 @@ model AIUsageLog {
   id           String   @id @default(uuid())
   userId       String
   agentId      String
+  agentType    String?
   provider     String
   model        String
   inputTokens  Int
