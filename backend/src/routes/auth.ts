@@ -73,13 +73,18 @@ router.post('/register', async (req, res) => {
             select: { id: true, name: true, email: true, credits: true }
         });
 
-        // Send Telegram notification for new signup
-        await telegramNotification.notifySignup({
-            email: user.email,
-            name: user.name || undefined,
-            cnpj: cnpj || undefined,
-            referralCode: referralCode || undefined
-        });
+        // Send Telegram notification for new signup (Safe Mode)
+        try {
+            await telegramNotification.notifySignup({
+                email: user.email,
+                name: user.name || undefined,
+                cnpj: cnpj || undefined,
+                referralCode: referralCode || undefined
+            });
+        } catch (tgError) {
+            console.error('Failed to send telegram notification:', tgError);
+            // Non-blocking error
+        }
 
         res.status(201).json({
             message: 'Usuário criado com sucesso',
