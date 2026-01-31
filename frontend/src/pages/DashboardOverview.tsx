@@ -7,19 +7,29 @@ export default function DashboardOverview() {
     const [metrics, setMetrics] = React.useState<any>(null);
     const [isLoading, setIsLoading] = React.useState(true);
 
+    const [error, setError] = React.useState<string | null>(null);
+
     React.useEffect(() => {
         const fetchMetrics = async () => {
             try {
                 const token = localStorage.getItem('token');
+                console.log('Fetching dashboard metrics...');
                 const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/dashboard/overview`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Metrics received:', data);
                     setMetrics(data);
+                } else {
+                    const errText = await response.text();
+                    console.error('Metrics fetch failed:', response.status, errText);
+                    setError(`Erro ${response.status}: ${errText.substring(0, 100)}`);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to load dashboard metrics", error);
+                setError(error.message);
             } finally {
                 setIsLoading(false);
             }
@@ -29,7 +39,26 @@ export default function DashboardOverview() {
     }, []);
 
     if (isLoading) {
-        return <div className="p-10 text-white">Carregando dados da missão...</div>;
+        return (
+            <div className="flex items-center justify-center p-20 text-white animate-pulse">
+                <div className="text-center">
+                    <h2 className="text-xl font-bold mb-2">Carregando Missão...</h2>
+                    <p className="text-gray-400 text-sm">Conectando aos satellites da VERA.</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-10 text-white bg-red-900/20 border border-red-500/30 rounded-xl">
+                <h3 className="font-bold text-red-400 text-lg mb-2">Falha no Carregamento do Painel</h3>
+                <p className="text-sm font-mono text-gray-300">{error}</p>
+                <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-500 rounded text-sm font-bold">
+                    Tentar Novamente
+                </button>
+            </div>
+        );
     }
 
     return (
@@ -138,7 +167,7 @@ export default function DashboardOverview() {
                     <div className="bg-[#1A1625] border border-[#292348] rounded-2xl p-6">
                         <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">Status da Rede Neural</h3>
                         <div className="space-y-4">
-                            {metrics?.systemStatus && metrics.systemStatus.length > 0 ? (
+                            {metrics?.systemStatus && Array.isArray(metrics.systemStatus) && metrics.systemStatus.length > 0 ? (
                                 metrics.systemStatus.map((s: any, i: number) => (
                                     <div key={i} className="flex justify-between items-center text-sm">
                                         <span className="text-gray-300 capitalize">{s.name.replace('_', ' ')}</span>
