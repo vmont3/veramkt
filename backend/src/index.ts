@@ -340,11 +340,39 @@ async function start() {
 
 start();
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`\n🌟 ================================================`);
-    console.log(`   VERA Backend Server`);
-    console.log(`   Running on: http://localhost:${PORT}`);
-    console.log(`   Status: ✅ ACTIVE`);
-    console.log(`================================================\n`);
-});
+// DB Auto-Healing & Server Start
+import { exec } from 'child_process';
+
+const ensureDatabaseSchema = () => {
+    return new Promise((resolve, reject) => {
+        console.log('🛠️  Verifying database schema...');
+        // Force schema push to ensure tables exist
+        exec('npx prisma db push --accept-data-loss', { cwd: __dirname + '/../' }, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`❌ Schema push FAILED: ${error.message}`);
+                console.error(stderr);
+                resolve(false);
+                return;
+            }
+            console.log(`✅ Schema push SUCCESS:\n${stdout}`);
+            resolve(true);
+        });
+    });
+};
+
+const startServer = async () => {
+    // 1. Ensure DB exists
+    await ensureDatabaseSchema();
+
+    // 2. Start Express Server
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`\n🌟 ================================================`);
+        console.log(`   VERA Backend Server`);
+        console.log(`   Running on: http://0.0.0.0:${PORT}`);
+        console.log(`   Status: ✅ ACTIVE`);
+        console.log(`================================================\n`);
+    });
+};
+
+startServer();
