@@ -146,6 +146,17 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// DB Check Route
+app.get('/api/health/db-check', async (req, res) => {
+    try {
+        const userCount = await prisma.user.count();
+        res.json({ status: 'connected', userCount, message: 'Database is reachable and User table exists.' });
+    } catch (error: any) {
+        console.error('DB Check Failed:', error);
+        res.status(500).json({ status: 'error', error: error.message, stack: error.stack });
+    }
+});
+
 app.get('/api/analytics', authenticateToken, async (req: any, res) => {
     try {
         const userId = req.user?.id;
