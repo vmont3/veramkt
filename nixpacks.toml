@@ -8,4 +8,4 @@ cmds = [
 ]
 
 [start]
-cmd = "npx serve -s frontend/dist -l $PORT --single"
+cmd = "cd frontend && npm start"
