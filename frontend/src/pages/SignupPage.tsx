@@ -18,6 +18,7 @@ export default function SignupPage() {
         setIsLoading(true);
 
         try {
+            console.log('Attempting register with URL:', `${import.meta.env.VITE_BACKEND_URL}/api/auth/register`); // DEBUG
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: {
