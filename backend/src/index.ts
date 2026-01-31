@@ -91,7 +91,7 @@ import { HealthCheckController } from './services/HealthCheckController';
 import { ConfigController } from './services/ConfigController';
 
 const app = express();
-app.use(cors({ origin: '*' })); // Allow all for development stability
+app.use(cors({ origin: ['https://web-production-624de.up.railway.app', 'http://localhost:5180', 'http://localhost:3000', '*'] })); // Allow production frontend
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
