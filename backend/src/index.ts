@@ -338,33 +338,11 @@ async function start() {
     }
 }
 
-start();
-
-// DB Auto-Healing & Server Start
-import { exec } from 'child_process';
-
-const ensureDatabaseSchema = () => {
-    return new Promise((resolve, reject) => {
-        console.log('🛠️  Verifying database schema...');
-        // Force schema push to ensure tables exist
-        exec('npx prisma db push --accept-data-loss', { cwd: __dirname + '/../' }, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`❌ Schema push FAILED: ${error.message}`);
-                console.error(stderr);
-                resolve(false);
-                return;
-            }
-            console.log(`✅ Schema push SUCCESS:\n${stdout}`);
-            resolve(true);
-        });
-    });
-};
-
 const startServer = async () => {
-    // 1. Ensure DB exists
-    await ensureDatabaseSchema();
+    // 1. Ensure DB exists (Auto-Healing)
+    const dbReady = await ensureDatabaseSchema();
 
-    // 2. Start Express Server
+    // 2. Start Express Server (API)
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`\n🌟 ================================================`);
@@ -373,6 +351,14 @@ const startServer = async () => {
         console.log(`   Status: ✅ ACTIVE`);
         console.log(`================================================\n`);
     });
+
+    // 3. Start Agents (ONLY if DB is ready)
+    if (dbReady) {
+        console.log('💚 Database ready, initializing agents...');
+        await start();
+    } else {
+        console.error('⛔ Database schema check failed. Agents skipped to prevent crash.');
+    }
 };
 
 startServer();
