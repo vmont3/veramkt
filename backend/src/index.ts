@@ -17,6 +17,25 @@ import { strategyAgent } from './services/agents/StrategyAgent'; // Proactive En
 import { performanceAgent } from './services/agents/PerformanceAgent'; // Performance Autopilot
 import { veraOrchestrator } from './services/agents/VeraOrchestrator'; // V2 Orchestrator
 import { prisma } from './database/prismaClient';
+import { exec } from 'child_process';
+
+// DB Auto-Healing Function (Must be defined early)
+const ensureDatabaseSchema = () => {
+    return new Promise((resolve, reject) => {
+        console.log('🛠️  Verifying database schema...');
+        // Force schema push to ensure tables exist
+        exec('npx prisma db push --accept-data-loss', { cwd: __dirname + '/../' }, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`❌ Schema push FAILED: ${error.message}`);
+                console.error(stderr);
+                resolve(false);
+                return;
+            }
+            console.log(`✅ Schema push SUCCESS:\n${stdout}`);
+            resolve(true);
+        });
+    });
+};
 
 /**
  * ProactiveScheduler - 4x Daily Strategic Pulse
