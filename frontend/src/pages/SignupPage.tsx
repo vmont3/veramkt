@@ -48,9 +48,9 @@ export default function SignupPage() {
                 console.error('Signup error', data);
                 alert(data.error || 'Erro ao criar conta');
             }
-        } catch (error) {
-            console.error("Signup failed", error);
-            alert('Erro de conexão com o servidor');
+        } catch (error: any) {
+            console.error("Signup failed details:", error);
+            alert(`Erro ao registrar: ${error.message || 'Erro desconhecido'}`);
         } finally {
             setIsLoading(false);
         }
