@@ -3,6 +3,8 @@ export default {
     content: [
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
+        "../frontend/src/**/*.{js,ts,jsx,tsx}", // Fallback for root execution
+        "./frontend/src/**/*.{js,ts,jsx,tsx}"   // Fallback for weird cwd
     ],
     theme: {
         extend: {
